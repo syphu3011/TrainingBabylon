@@ -129,17 +129,24 @@ export class Chesspiece {
         });
     }
     private detectCollision() {
-        let first = true
+        // let first = true
         this.saveDetectColission = this.scene.onBeforeRenderObservable.add(() => {
             this.scene.meshes.forEach(mesh => {
-                if (!this.type && mesh.name == "blackChesspiece") {
-                    if (!first) {
+                // if (!this.type && mesh.name == "blackChesspiece") {
+                //     if (!first) {
+                //         if (this.mesh.intersectsMesh(mesh, false)) {
+                //             this.die()
+                //         }
+                //     }
+                //     else {
+                //         first = false
+                //     }
+                // }
+                if (this.mesh !== mesh) {
+                    if (!this.type && mesh.name == "blackChesspiece") {
                         if (this.mesh.intersectsMesh(mesh, false)) {
                             this.die()
                         }
-                    }
-                    else {
-                        first = false
                     }
                 }
             })

@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import {Tools, Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager, EngineFactory, int, Animation, float, StandardMaterial, KeyboardEventTypes } from "@babylonjs/core";
+import { Tools, Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager, EngineFactory, int, Animation, float, StandardMaterial, KeyboardEventTypes } from "@babylonjs/core";
 import { ChessBoard } from "./ChessBoard";
 enum KEY {
     w = 'w',
@@ -30,8 +30,8 @@ export class Chesspiece {
     private saveDetectMoveAction: any
     private saveDetectColission: any
     // private isPressing = false
-    private waiting_move_list: (() => void)[]  = []
-    constructor(currentXOnBoard: int, currentZOnBoard:int, height: float, width: float, depth, type: boolean, scene: Scene) {
+    private waiting_move_list: (() => void)[] = []
+    constructor(currentXOnBoard: int, currentZOnBoard: int, height: float, width: float, depth, type: boolean, scene: Scene) {
         this.currentXOnBoard = currentXOnBoard
         this.currentZOnBoard = currentZOnBoard
         this.height = height
@@ -41,25 +41,17 @@ export class Chesspiece {
         this.scene = scene
         this.position = ChessBoard.position2D[this.currentXOnBoard][this.currentZOnBoard]
         this.mesh = this.createMesh()
-        scene.onBeforeRenderObservable.add(() => {
-            if (!this.isMoving) {
-                let current_move = this.waiting_move_list.shift()
-                if (current_move != null) {
-                    current_move()
-                }
-            } 
-        });
         // input move
         this.inputMoveAction()
         this.detectMoveAction()
         this.detectCollision()
     }
-    public set setPosition(position : Vector3) {
+    public set setPosition(position: Vector3) {
         this.position = position;
         this.mesh.position = position
     }
-    
-    public get getPosition() : Vector3 {
+
+    public get getPosition(): Vector3 {
         return this.position
     }
     public get getMesh(): Mesh {
@@ -70,15 +62,15 @@ export class Chesspiece {
         try {
             // create a new material with the desired color
             const material = new StandardMaterial("myMaterial", this.scene);
-            material.diffuseColor = this.type ? new Color3(0.1, 0.1, 0.1): new Color3(0.4,0.4,0.4)
+            material.diffuseColor = this.type ? new Color3(0.1, 0.1, 0.1) : new Color3(0.4, 0.4, 0.4)
             // create mesh
-            let mesh = MeshBuilder.CreateBox(this.type ? "blackChesspiece":"whiteChesspiece", {height: this.height, width: this.width, depth: this.depth},this.scene);
+            let mesh = MeshBuilder.CreateBox(this.type ? "blackChesspiece" : "whiteChesspiece", { height: this.height, width: this.width, depth: this.depth }, this.scene);
             mesh.material = material
             mesh.position = this.position
             mesh.checkCollisions = true
             return mesh
         }
-        catch(e) {
+        catch (e) {
             console.log(e);
         }
         return new Mesh("null_mesh")
@@ -133,7 +125,7 @@ export class Chesspiece {
                 if (current_move != null) {
                     current_move()
                 }
-            } 
+            }
         });
     }
     private detectCollision() {
@@ -157,22 +149,22 @@ export class Chesspiece {
     private move(degree: int) {
         this.isMoving = true
         const rad = Tools.ToRadians(degree)
-        this.mesh.rotation = new Vector3(0,rad,0)
+        this.mesh.rotation = new Vector3(0, rad, 0)
         //animation
         let animation = new Animation("moveAnimation", "position", 60, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT)
         let keys = []
         const x = this.currentXOnBoard
         const z = this.currentZOnBoard
-        
+
         keys.push({ frame: 0, value: this.position });
-        keys.push({ frame: 5, value: ChessBoard.position2D[this.currentXOnBoard][this.currentZOnBoard]});
+        keys.push({ frame: 5, value: ChessBoard.position2D[this.currentXOnBoard][this.currentZOnBoard] });
         animation.setKeys(keys);
         this.mesh.animations.push(animation)
         const anim = this.scene.beginAnimation(this.mesh, 0, 5); // Bắt đầu animation
 
         let observable = this.scene.onBeforeRenderObservable.add(() => {
             //stop
-            if (this.mesh.position.x === ChessBoard.position2D[x][z].x  && this.mesh.position.z === ChessBoard.position2D[x][z].z) {
+            if (this.mesh.position.x === ChessBoard.position2D[x][z].x && this.mesh.position.z === ChessBoard.position2D[x][z].z) {
                 anim.stop()
                 this.isMoving = false;
                 this.setPosition = ChessBoard.position2D[x][z]
@@ -199,16 +191,16 @@ export class Chesspiece {
     }
     //method move
     public moveUp() {
-        this.waiting_move_list.push(()=>{this.moveUpProcess()})
+        this.waiting_move_list.push(() => { this.moveUpProcess() })
     }
     public moveDown() {
-        this.waiting_move_list.push(()=>{this.moveDownProcess()})
+        this.waiting_move_list.push(() => { this.moveDownProcess() })
     }
     public moveLeft() {
-        this.waiting_move_list.push(()=>{this.moveLeftProcess()})
+        this.waiting_move_list.push(() => { this.moveLeftProcess() })
     }
     public moveRight() {
-        this.waiting_move_list.push(()=>{this.moveRightProcess()})
+        this.waiting_move_list.push(() => { this.moveRightProcess() })
     }
     //die
     public die() {
@@ -221,6 +213,6 @@ export class Chesspiece {
             if (this.mesh.visibility <= 0) {
                 this.mesh.dispose()
             }
-        }) 
+        })
     }
 }

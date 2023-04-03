@@ -1,15 +1,15 @@
-import { Color3, Mesh, MeshBuilder, MultiMaterial, Scene, StandardMaterial, SubMesh, Vector3 } from "@babylonjs/core";
+import { Color3, Mesh, MeshBuilder, MultiMaterial, Scene, StandardMaterial, SubMesh, Vector3, int } from "@babylonjs/core";
 
 export class ChessBoard {
     public static position2D: Vector3[][] = []
-    private xmin = -5
-    private xmax = 5
-    private zmin = -5
-    private zmax = 5
+    private xmin: int
+    private xmax: int
+    private zmin: int
+    private zmax: int
     private grid: any
     private scene: Scene
     private mesh: Mesh
-    constructor(xmin = -5, xmax = 5, zmin = -5, zmax = 5, grid = {w:8, h:8}, scene: Scene) {
+    constructor(xmin = -5, xmax = 5, zmin = -5, zmax = 5, grid = { w: 8, h: 8 }, scene: Scene) {
         this.xmin = xmin
         this.xmax = xmax
         this.zmax = zmax
@@ -23,7 +23,7 @@ export class ChessBoard {
     }
     private createMesh(): Mesh {
         try {
-            const tiledGround = MeshBuilder.CreateTiledGround("Tiled Ground", {xmin: this.xmin, zmin: this.zmin, xmax: this.xmax, zmax: this.zmax, subdivisions: this.grid},this.scene);
+            const tiledGround = MeshBuilder.CreateTiledGround("Tiled Ground", { xmin: this.xmin, zmin: this.zmin, xmax: this.xmax, zmax: this.zmax, subdivisions: this.grid }, this.scene);
             tiledGround.position.y = 1;
             //Create the multi material
             //Create differents materials
@@ -37,12 +37,12 @@ export class ChessBoard {
             const multimat = new MultiMaterial("multi", this.scene);
             multimat.subMaterials.push(whiteMaterial);
             multimat.subMaterials.push(blackMaterial);
-            
+
 
             // Apply the multi material
             // Define multimat as material of the tiled ground
             tiledGround.material = multimat;
-        
+
             // Needed variables to set subMeshes
             const verticesCount = tiledGround.getTotalVertices();
             const indices = tiledGround.getIndices()
@@ -51,7 +51,7 @@ export class ChessBoard {
             for (let row = 0; row < this.grid.h; row++) {
                 let pos_row_ar: Vector3[] = []
                 for (let col = 0; col < this.grid.w; col++) {
-                    let submesh = new SubMesh(row%2 ^ col%2, 0, verticesCount, base , tileIndicesLength, tiledGround) 
+                    let submesh = new SubMesh(row % 2 ^ col % 2, 0, verticesCount, base, tileIndicesLength, tiledGround)
                     tiledGround.subMeshes.push(submesh);
                     // let subMeshPosition = Vector3.Zero();
                     let boundingInfo = submesh.getBoundingInfo();

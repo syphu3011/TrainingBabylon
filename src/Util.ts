@@ -2,7 +2,7 @@ export class Util {
     public static randomInRangeExcept(min: number, max: number, except: number): number {
         let result = Math.floor(Math.random() * (max - min + 1)) + min;
         if (result === except) {
-          return Util.randomInRangeExcept(min, max, except);
+            return Util.randomInRangeExcept(min, max, except);
         }
         return result;
     }

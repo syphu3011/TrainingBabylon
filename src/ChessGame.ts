@@ -1,12 +1,12 @@
-import "@babylonjs/core/Debug/debugLayer";
-import "@babylonjs/inspector";
-import "@babylonjs/loaders/glTF";
+// import "@babylonjs/core/Debug/debugLayer";
+// import "@babylonjs/inspector";
+// import "@babylonjs/loaders/glTF";
 import { Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager, EngineFactory, ArcRotateCamera, HemisphericLight, KeyboardEventTypes, ArcFollowCamera, int } from "@babylonjs/core";
-import { Chesspiece } from "./Chesspiece";
+import { ChessPiece } from "./ChessPiece";
 import { ChessBoard } from "./ChessBoard";
 import { Util } from "./Util";
 //BLACK CATCH WHITE
-class ChessGame {
+export class ChessGame {
     private canvas: any
     private engine: any
     private scene: any
@@ -62,8 +62,8 @@ class ChessGame {
         this.chessBoard = new ChessBoard(-5, 5, -5, 5, this.grid, this.scene)
         let posKiller = this.randomIndex()
         let posRunner = this.randomIndex()
-        let chessKiller = new Chesspiece(posKiller.x, posKiller.z, 1, 0.75, 0.25, true, this.scene)
-        let chessRunner = new Chesspiece(posRunner.x, posRunner.z, 1, 0.75, 0.25, false, this.scene)
+        let chessKiller = new ChessPiece(posKiller.x, posKiller.z, 1, 0.75, 0.25, true, this.scene)
+        let chessRunner = new ChessPiece(posRunner.x, posRunner.z, 1, 0.75, 0.25, false, this.scene)
     }
     // it can be applied even to the case where there are many black and white chesspieces chasing each other
     private randomIndex() {
@@ -75,4 +75,4 @@ class ChessGame {
         return indexReturn
     }
 }
-new ChessGame()
+// new ChessGame()

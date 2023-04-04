@@ -1,6 +1,6 @@
-import "@babylonjs/core/Debug/debugLayer";
-import "@babylonjs/inspector";
-import "@babylonjs/loaders/glTF";
+// import "@babylonjs/core/Debug/debugLayer";
+// import "@babylonjs/inspector";
+// import "@babylonjs/loaders/glTF";
 import { Tools, Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager, EngineFactory, int, Animation, float, StandardMaterial, KeyboardEventTypes } from "@babylonjs/core";
 import { ChessBoard } from "./ChessBoard";
 enum KEY {
@@ -13,7 +13,7 @@ enum KEY {
     ArrowLeft = 'ArrowLeft',
     ArrowRight = 'ArrowRight'
 }
-export class Chesspiece {
+export class ChessPiece {
     private position: Vector3
     private mesh: Mesh
     private currentXOnBoard: int
@@ -129,26 +129,26 @@ export class Chesspiece {
         });
     }
     private detectCollision() {
-        // let first = true
+        let first = true
         this.saveDetectColission = this.scene.onBeforeRenderObservable.add(() => {
             this.scene.meshes.forEach(mesh => {
-                // if (!this.type && mesh.name == "blackChesspiece") {
-                //     if (!first) {
-                //         if (this.mesh.intersectsMesh(mesh, false)) {
-                //             this.die()
-                //         }
-                //     }
-                //     else {
-                //         first = false
-                //     }
-                // }
-                if (this.mesh !== mesh) {
-                    if (!this.type && mesh.name == "blackChesspiece") {
+                if (!this.type && mesh.name == "blackChesspiece") {
+                    if (!first) {
                         if (this.mesh.intersectsMesh(mesh, false)) {
                             this.die()
                         }
                     }
+                    else {
+                        first = false
+                    }
                 }
+                // if (this.mesh !== mesh) {
+                //     if (!this.type && mesh.name == "blackChesspiece") {
+                //         if (this.mesh.intersectsMesh(mesh, false)) {
+                //             this.die()
+                //         }
+                //     }
+                // }
             })
         })
     }

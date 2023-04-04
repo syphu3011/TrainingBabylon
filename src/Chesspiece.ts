@@ -64,7 +64,7 @@ export class ChessPiece {
             const material = new StandardMaterial("myMaterial", this.scene);
             material.diffuseColor = this.type ? new Color3(0.1, 0.1, 0.1) : new Color3(0.4, 0.4, 0.4)
             // create mesh
-            let mesh = MeshBuilder.CreateBox(this.type ? "blackChesspiece" : "whiteChesspiece", { height: this.height, width: this.width, depth: this.depth }, this.scene);
+            let mesh = MeshBuilder.CreateBox(this.type ? "blackChessPiece" : "whiteChessPiece", { height: this.height, width: this.width, depth: this.depth }, this.scene);
             mesh.material = material
             mesh.position = this.position
             mesh.checkCollisions = true
@@ -129,28 +129,17 @@ export class ChessPiece {
         });
     }
     private detectCollision() {
-        let first = true
-        this.saveDetectColission = this.scene.onBeforeRenderObservable.add(() => {
-            this.scene.meshes.forEach(mesh => {
-                if (!this.type && mesh.name == "blackChesspiece") {
-                    if (!first) {
+        if (!this.type) {
+            this.saveDetectColission = this.scene.onAfterRenderObservable.add(() => {
+                this.scene.meshes.forEach(mesh => {
+                    if (mesh.name == "blackChessPiece") {
                         if (this.mesh.intersectsMesh(mesh, false)) {
                             this.die()
                         }
                     }
-                    else {
-                        first = false
-                    }
-                }
-                // if (this.mesh !== mesh) {
-                //     if (!this.type && mesh.name == "blackChesspiece") {
-                //         if (this.mesh.intersectsMesh(mesh, false)) {
-                //             this.die()
-                //         }
-                //     }
-                // }
+                })
             })
-        })
+        }
     }
     //private process
     private move(degree: int) {
@@ -213,7 +202,9 @@ export class ChessPiece {
     public die() {
         this.scene.onBeforeRenderObservable.remove(this.saveInputMoveAction)
         this.scene.onBeforeRenderObservable.remove(this.saveDetectMoveAction)
-        this.scene.onBeforeRenderObservable.remove(this.saveDetectColission)
+        if (this.saveDetectColission !== null) {
+            this.scene.onBeforeRenderObservable.remove(this.saveDetectColission)
+        }
         this.scene.onBeforeRenderObservable.add(() => {
             this.mesh.visibility -= 0.05
             this.setPosition = new Vector3(this.position.x, this.position.y + 0.1, this.position.z)

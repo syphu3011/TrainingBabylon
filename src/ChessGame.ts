@@ -1,7 +1,4 @@
-// import "@babylonjs/core/Debug/debugLayer";
-// import "@babylonjs/inspector";
-// import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager, EngineFactory, ArcRotateCamera, HemisphericLight, KeyboardEventTypes, ArcFollowCamera, int } from "@babylonjs/core";
+import { Engine, Scene, Vector3, HemisphericLight, ArcFollowCamera} from "@babylonjs/core";
 import { ChessPiece } from "./ChessPiece";
 import { ChessBoard } from "./ChessBoard";
 import { Util } from "./Util";
@@ -19,7 +16,6 @@ export class ChessGame {
     private grid = { w: 8, h: 8 }
     private chessBoard: ChessBoard
     constructor() {
-
         this.init();
     }
     private init() {
@@ -29,15 +25,15 @@ export class ChessGame {
         this.game()
         this.camera = new ArcFollowCamera('camera', -Math.PI / 2, Math.PI / 4, 15, this.chessBoard.getMesh, this.scene);
         this.camera.attachControl(this.canvas, true);
-        this.light1 = new HemisphericLight("light1", new Vector3(0, 6, 1), this.scene);
-        this.light2 = new HemisphericLight("light2", new Vector3(0, 6, 16), this.scene);
-        this.light3 = new HemisphericLight("light3", new Vector3(1, 6, 0), this.scene);
-        this.light4 = new HemisphericLight("light4", new Vector3(16, 6,), this.scene);
+        this.light1 = new HemisphericLight("light1", new Vector3(0, 6, 1), this.scene); // light at bottom
+        this.light2 = new HemisphericLight("light2", new Vector3(0, 6, 16), this.scene);// light at top
+        this.light3 = new HemisphericLight("light3", new Vector3(1, 6, 0), this.scene); // light at left
+        this.light4 = new HemisphericLight("light4", new Vector3(16, 6,), this.scene);  // light at right
         this.engine.runRenderLoop(() => {
             this.scene.render()
         })
     }
-    //set up the canvas
+
     private createCanvas() {
         document.documentElement.style["overflow"] = "hidden";
         document.documentElement.style.overflow = "hidden";
@@ -62,8 +58,8 @@ export class ChessGame {
         this.chessBoard = new ChessBoard(-5, 5, -5, 5, this.grid, this.scene)
         let posKiller = this.randomIndex()
         let posRunner = this.randomIndex()
-        let chessKiller = new ChessPiece(posKiller.x, posKiller.z, 1, 0.75, 0.25, true, this.scene)
-        let chessRunner = new ChessPiece(posRunner.x, posRunner.z, 1, 0.75, 0.25, false, this.scene)
+        let chessKiller = new ChessPiece(posKiller.x, posKiller.z, 1, 0.75, 0.25, true, this.scene)//black piece
+        let chessRunner = new ChessPiece(posRunner.x, posRunner.z, 1, 0.75, 0.25, false, this.scene)//white piece
     }
     // it can be applied even to the case where there are many black and white chesspieces chasing each other
     private randomIndex() {
@@ -75,4 +71,3 @@ export class ChessGame {
         return indexReturn
     }
 }
-// new ChessGame()

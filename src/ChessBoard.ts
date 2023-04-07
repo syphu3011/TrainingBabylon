@@ -53,12 +53,11 @@ export class ChessBoard {
                 for (let col = 0; col < this.grid.w; col++) {
                     let submesh = new SubMesh(row % 2 ^ col % 2, 0, verticesCount, base, tileIndicesLength, tiledGround)
                     tiledGround.subMeshes.push(submesh);
-                    // let subMeshPosition = Vector3.Zero();
+                    
                     let boundingInfo = submesh.getBoundingInfo();
                     const position = boundingInfo.boundingBox.center
                     position.y = 1.5
                     pos_row_ar.push(position);
-                    // pos_ar.push(new BABYLON.Vector3(range_x-col, 1,range_z-row));
                     base += tileIndicesLength;
                 }
                 ChessBoard.position2D.push(pos_row_ar);

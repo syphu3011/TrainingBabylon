@@ -1,17 +1,24 @@
-// import "@babylonjs/core/Debug/debugLayer";
-// import "@babylonjs/inspector";
-// import "@babylonjs/loaders/glTF";
-import { Tools, Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager, EngineFactory, int, Animation, float, StandardMaterial, KeyboardEventTypes } from "@babylonjs/core";
+import { Tools, Scene, Vector3, Mesh, Color3, MeshBuilder, int, Animation, float, StandardMaterial, KeyboardEventTypes, AnimationGroup } from "@babylonjs/core";
+import "@babylonjs/loaders";
 import { ChessBoard } from "./ChessBoard";
 enum KEY {
-    w = 'w',
-    s = 's',
-    a = 'a',
-    d = 'd',
+    //WASD
+    W = 'w',
+    S = 's',
+    A = 'a',
+    D = 'd',
+
+    //Arrow direction
     ArrowUp = 'ArrowUp',
     ArrowDown = 'ArrowDown',
     ArrowLeft = 'ArrowLeft',
     ArrowRight = 'ArrowRight'
+}
+enum DIRECTION {
+    LEFT = -90,
+    RIGHT = 90,
+    UP = 0,
+    DOWN = 180,
 }
 export class ChessPiece {
     private position: Vector3
@@ -81,16 +88,16 @@ export class ChessPiece {
                 switch (kbInfo.type) {
                     case KeyboardEventTypes.KEYUP:
                         switch (kbInfo.event.key) {
-                            case KEY.w:
+                            case KEY.W:
                                 this.moveUp()
                                 break;
-                            case KEY.s:
+                            case KEY.S:
                                 this.moveDown()
                                 break;
-                            case KEY.a:
+                            case KEY.A:
                                 this.moveLeft()
                                 break
-                            case KEY.d:
+                            case KEY.D:
                                 this.moveRight()
                                 break
                         }
@@ -145,45 +152,66 @@ export class ChessPiece {
     private move(degree: int) {
         this.isMoving = true
         const rad = Tools.ToRadians(degree)
-        this.mesh.rotation = new Vector3(0, rad, 0)
-        //animation
-        let animation = new Animation("moveAnimation", "position", 60, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT)
-        let keys = []
         const x = this.currentXOnBoard
         const z = this.currentZOnBoard
-
-        keys.push({ frame: 0, value: this.position });
-        keys.push({ frame: 5, value: ChessBoard.position2D[this.currentXOnBoard][this.currentZOnBoard] });
-        animation.setKeys(keys);
-        this.mesh.animations.push(animation)
-        const anim = this.scene.beginAnimation(this.mesh, 0, 5); // Bắt đầu animation
+        const animationRun = this.animRun()
+        const animationRotate = this.animRotate(rad)
+        var animationGroup = new AnimationGroup("GroupMoveAction");
+        animationGroup.addTargetedAnimation(animationRun, this.mesh);
+        animationGroup.addTargetedAnimation(animationRotate, this.mesh);
+        animationGroup.normalize(0, 5);
+        animationGroup.play(true)
 
         let observable = this.scene.onBeforeRenderObservable.add(() => {
-            //stop
             if (this.mesh.position.x === ChessBoard.position2D[x][z].x && this.mesh.position.z === ChessBoard.position2D[x][z].z) {
-                anim.stop()
+                animationGroup.stop()
+
                 this.isMoving = false;
                 this.setPosition = ChessBoard.position2D[x][z]
                 this.scene.onBeforeRenderObservable.remove(observable);
             }
         });
     }
+    private animRun(): Animation {
+        let animation = new Animation("moveAnimation", "position", 60, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT)
+
+        let keys = []
+        keys.push({ frame: 0, value: this.position });
+        keys.push({ frame: 5, value: ChessBoard.position2D[this.currentXOnBoard][this.currentZOnBoard] });
+        animation.setKeys(keys);
+
+        return animation
+    }
+    private animRotate(radian: float): Animation {
+        let animation = new Animation("rotateAnimation", "rotation", 60, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT)
+        //choose nearest radian to rotate
+        let normalRad = radian
+        let reverseRad = radian >= 0 ? radian - 2 * Math.PI : radian + 2 * Math.PI
+        let mainRad = Math.abs(this.mesh.rotation.y - normalRad) <= Math.abs(this.mesh.rotation.y - reverseRad) ? normalRad : reverseRad
+
+        let keys = []
+        keys.push({ frame: 0, value: this.mesh.rotation});
+        keys.push({ frame: 5, value: new Vector3(0,mainRad,0)});
+        animation.setKeys(keys);
+
+        return animation
+    }
     private moveUpProcess() {
         this.currentXOnBoard += ChessBoard.position2D.length - 1 != this.currentXOnBoard ? 1 : 0
-        this.move(0)
+        this.move(DIRECTION.UP)
     }
     private moveDownProcess() {
         this.currentXOnBoard -= 0 != this.currentXOnBoard ? 1 : 0
-        this.move(180)
+        this.move(DIRECTION.DOWN)
     }
     private moveLeftProcess() {
         this.currentZOnBoard -= 0 != this.currentZOnBoard ? 1 : 0
-        this.move(-90)
+        this.move(DIRECTION.LEFT)
     }
     private moveRightProcess() {
         const maxZ = ChessBoard.position2D.length > 0 ? ChessBoard.position2D[0].length : 0
         this.currentZOnBoard += maxZ - 1 != this.currentZOnBoard ? 1 : 0
-        this.move(90)
+        this.move(DIRECTION.RIGHT)
     }
     //method move
     public moveUp() {
@@ -198,7 +226,6 @@ export class ChessPiece {
     public moveRight() {
         this.waiting_move_list.push(() => { this.moveRightProcess() })
     }
-    //die
     public die() {
         this.scene.onBeforeRenderObservable.remove(this.saveInputMoveAction)
         this.scene.onBeforeRenderObservable.remove(this.saveDetectMoveAction)

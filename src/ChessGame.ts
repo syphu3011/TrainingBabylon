@@ -46,6 +46,7 @@ export class ChessGame {
             }
         })
     }
+    //TODO: doing
     private compare2Quaternion(Quaternion1, Quaternion2) {
         if (Quaternion1._x == Quaternion2._x) {
             if (Quaternion1._y == Quaternion2._y){

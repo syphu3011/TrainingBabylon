@@ -38,7 +38,7 @@ export class ChessPiece {
     private saveDetectColission: any
     // private isPressing = false
     private waiting_move_list: (() => void)[] = []
-    constructor(currentXOnBoard: int, currentZOnBoard: int, height: float, width: float, depth, type: boolean, scene: Scene) {
+    constructor(currentXOnBoard: int, currentZOnBoard: int, height: float, width: float, depth: float, type: boolean, scene: Scene) {
         this.currentXOnBoard = currentXOnBoard
         this.currentZOnBoard = currentZOnBoard
         this.height = height
@@ -163,7 +163,8 @@ export class ChessPiece {
         animationGroup.play(true)
 
         let observable = this.scene.onBeforeRenderObservable.add(() => {
-            if (this.mesh.position.x === ChessBoard.position2D[x][z].x && this.mesh.position.z === ChessBoard.position2D[x][z].z) {
+            if (this.mesh.position.x === ChessBoard.position2D[x][z].x &&
+                 this.mesh.position.z === ChessBoard.position2D[x][z].z) {
                 animationGroup.stop()
 
                 this.isMoving = false;
